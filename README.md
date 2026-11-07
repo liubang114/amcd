@@ -32,14 +32,18 @@ A single-binary Minecraft downloader written in Go, with Chinese/English UI and 
 | --- | --- |
 | `dl` | 下载游戏 / download a game instance |
 | `ins` | 安装整合包 / install a modpack |
-| `ls [type]` | 列出可下载版本 / list downloadable versions |
+| `ls [type]` | 按时间升序列出可下载版本 / list downloadable versions, oldest first |
+| `java ls` | 列出可安装的 Java 运行时 / list installable Java runtimes |
+| `java install <组件\|版本>` | 安装指定 Java 运行时 / install a specific runtime |
 
 ```bash
 amcd dl -1.20.1                                        # 原版 / vanilla
 amcd dl -1.20.1 -forge -47.4.28 -E:\mc                 # Forge 指定版本
 amcd dl -1.21.8 -neoforge -"E:\my games\mc"            # 路径含空格请加引号
 amcd ins 整合包.mrpack                                  # 安装 modpacks/ 下的整合包
-amcd ls release                                        # 只看正式版
+amcd ls release                                        # 只看正式版（升序）
+amcd java install 17                                   # 手动安装 Java 17
+amcd java ls                                           # 查看可用 Java 及安装状态
 ```
 
 启动时会自动在工作区生成 `config.toml`、`使用说明.txt`、`version/`、`modpacks/`、`logs/`。
@@ -81,7 +85,7 @@ src/
 ├── mirror/            BMCLAPI 映射与元数据 / mirror mapping
 ├── metadata/          版本 JSON 结构
 ├── progress/          天蓝色单行进度条
-├── javaruntime/       Java 探测与版本匹配
+├── javaruntime/       Java 探测、版本匹配与运行时下载
 ├── i18n/              中英文文案
 └── logx/              运行日志
 ```
@@ -89,7 +93,7 @@ src/
 ## 已知限制 / Limitations
 
 - CurseForge 整合包若只带 `projectID/fileID`，必须填 `curseforge_api_key` 才能解析；否则这些文件会被跳过并提示数量。
-- Forge / NeoForge 安装需要本机有 Java；Fabric / Quilt 与原版下载不需要。
+- Forge / NeoForge 安装需要 Java；缺失时会询问是否自动安装（Mojang 官方运行时清单，BMCLAPI 加速，装在 `runtime/<组件>/`）。Fabric / Quilt 与原版下载不需要 Java。
 - 只构建 Windows amd64；其他平台可自行交叉编译。
 
 ## 许可 / License
