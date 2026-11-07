@@ -14,8 +14,14 @@ dl  [-版本] [-forge|-neoforge|-fabric|-quilt] [-加载器版本] [-路径] [-�
       amcd dl 1.20.3 -forge "-E:\my games\mc"
 
 ls [release|snapshot|old_beta|old_alpha]
-    列出所有可下载的游戏版本 / list all downloadable game versions
+    按时间升序列出所有可下载的游戏版本 / list downloadable versions, oldest first
     例 / e.g.  amcd ls release
+
+java ls
+    列出可安装的 Java 运行时及安装状态 / list installable Java runtimes
+java install <组件名|主版本号>
+    安装指定 Java 运行时 / install a specific runtime
+    例 / e.g.  amcd java install 17
 
 ins <文件名.zip|文件名.mrpack> [-路径]
     安装 modpacks 目录下的整合包 / install a modpack from the modpacks folder
@@ -42,6 +48,12 @@ libraries/ 与 assets/ 放在安装根目录（与 PCL、HMCL 的 .minecraft 结
 libraries/ and assets/ live at the install root (PCL/HMCL compatible .minecraft layout); the instance folder holds the json, jar and natives.
 实例名：原版为版本号，带加载器为 <版本号>-<加载器>，整合包为清单名称。
 Instance name: the version id, <version>-<loader>, or the modpack name.
+
+【Java / Java runtimes】
+Forge / NeoForge 安装需要 Java；缺少时会询问是否自动安装（来源：Mojang 官方运行时清单，BMCLAPI 加速）。
+Forge/NeoForge need Java; if missing, amcd offers to install one from Mojang's runtime index.
+可手动安装多个版本 / install specific versions: amcd java ls、amcd java install 8|17|21|<组件名>
+运行时装在 runtime/<组件>/ 下 / runtimes live under runtime/<component>/.
 
 【下载行为 / Download behaviour】
 - 下载由 BMCLAPI 提供加速；镜像节点不可用时自动回退官方源，并对限流（403/429）退避重试。

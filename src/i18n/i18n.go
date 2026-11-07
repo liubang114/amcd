@@ -202,6 +202,10 @@ var messages = map[string][2]string{
 		"没有找到满足 Java %d 的运行时",
 		"No runtime satisfies Java %d",
 	},
+	"msg.javaStateInstalled": {
+		"已安装",
+		"installed",
+	},
 	"msg.done": {"安装完成", "Installation complete"},
 	"msg.installing": {
 		"安装 %s",

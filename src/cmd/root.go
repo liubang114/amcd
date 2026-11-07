@@ -95,6 +95,7 @@ func newRootCmd() *cobra.Command {
 	root.AddCommand(newDLCmd())
 	root.AddCommand(newInsCmd())
 	root.AddCommand(newLSCmd())
+	root.AddCommand(newJavaCmd())
 	root.AddCommand(newInstallJavaCmd())
 	return root
 }

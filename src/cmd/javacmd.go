@@ -15,6 +15,104 @@ import (
 	"amcd/winconsole"
 )
 
+// newJavaCmd java 命令组：列出/安装 Java 运行时
+// java command group: list and install Java runtimes
+func newJavaCmd() *cobra.Command {
+	java := &cobra.Command{
+		Use:                "java",
+		Short:              "管理 Java 运行时 / manage Java runtimes",
+		Args:               cobra.ArbitraryArgs,
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 || wantsHelp(args) {
+				return cmd.Help()
+			}
+			switch args[0] {
+			case "ls", "list":
+				return runJavaLS()
+			case "install":
+				if len(args) != 2 {
+					return i18n.E("err.badParam")
+				}
+				return runJavaInstallCommand(args[1])
+			}
+			return i18n.E("err.badParam")
+		},
+	}
+	java.AddCommand(&cobra.Command{
+		Use:                "ls",
+		Short:              "列出可安装的 Java 运行时 / list installable runtimes",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runJavaLS()
+		},
+	})
+	java.AddCommand(&cobra.Command{
+		Use:                "install <组件名|主版本号>",
+		Short:              "安装指定 Java 运行时 / install a Java runtime",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return i18n.E("err.badParam")
+			}
+			return runJavaInstallCommand(args[0])
+		},
+	})
+	return java
+}
+
+// runJavaLS 列出 Mojang 提供的运行时及其安装状态
+func runJavaLS() error {
+	ctx := AppContext()
+	components, err := javaruntime.Components(ctx)
+	if err != nil {
+		fmt.Println(i18n.Sky(i18n.T("msg.hint.mirror")))
+		return i18n.E("err.network", err)
+	}
+	base := appCfg.BaseDir()
+	for _, c := range components {
+		state := ""
+		if _, statErr := os.Stat(javaruntime.ExePath(base, c.Name)); statErr == nil {
+			state = i18n.T("msg.javaStateInstalled")
+		}
+		fmt.Println(i18n.Sky(fmt.Sprintf("%-28s Java %-4d %-24s %s", c.Name, c.Version, c.NiceName, state)))
+	}
+	return nil
+}
+
+// runJavaInstallCommand 支持组件名或主版本号
+func runJavaInstallCommand(arg string) error {
+	ctx := AppContext()
+	components, err := javaruntime.Components(ctx)
+	if err != nil {
+		fmt.Println(i18n.Sky(i18n.T("msg.hint.mirror")))
+		return i18n.E("err.network", err)
+	}
+
+	comp, ok := javaruntime.FindByName(components, arg)
+	if !ok {
+		major := 0
+		if _, scanErr := fmt.Sscanf(arg, "%d", &major); scanErr == nil && major > 0 {
+			comp, ok = javaruntime.Pick(components, major)
+		}
+	}
+	if !ok {
+		return i18n.E("err.badParam")
+	}
+
+	self, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	fmt.Println(i18n.Sky(i18n.Tf("msg.javaInstalling", comp.NiceName, comp.Name)))
+	if winconsole.Available() {
+		if err := winconsole.Run(self, "__install-java", comp.Name); err == nil {
+			return nil
+		}
+	}
+	return runInstallJava(comp.Name)
+}
+
 // newInstallJavaCmd 隐藏命令：在新窗口里下载并安装 Java 运行时
 // hidden command: download a Mojang runtime inside its own console window
 func newInstallJavaCmd() *cobra.Command {
