@@ -1,0 +1,17 @@
+# 默认下载目录 / Default download directory
+# 游戏与整合包将安装到此路径下的 <实例名>/ 子目录
+# Games and modpacks are installed into <instance>/ under this path
+default_path = "./version"
+
+# 默认下载源 / Default download source
+# BMCLAPI 镜像根地址 / BMCLAPI mirror root URL
+default_source = "https://bmclapi2.bangbang93.com/"
+
+# 界面语言 / Interface language
+# 可选值 / Available: en_us, zh_cn
+language = "zh_cn"
+
+# CurseForge API Key（可留空）/ CurseForge API key (optional)
+# 整合包的 CurseForge 文件解析需要 Key，留空时只能使用整合包自带的直链
+# CurseForge file resolution needs a key; leave empty to use only inline download URLs
+curseforge_api_key = ""
